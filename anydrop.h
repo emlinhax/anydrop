@@ -92,7 +92,7 @@ namespace anydrop
 		return !(wcsicmp(explorer_path, w_full_dll_name) == 0);
 	}
 
-	HRESULT move(LPCWSTR src_path, LPCWSTR dest_path)
+	HRESULT move(LPCWSTR src_path, LPCWSTR dest_path, BOOL copy)
 	{
 		IFileOperation* file_operation = NULL;
 		IShellItem* from = NULL;
@@ -111,9 +111,14 @@ namespace anydrop
 			filename--;
 		}
 
-		hr = file_operation->CopyItem(from, to, filename, NULL);
-		if (SUCCEEDED(hr))
-		{
+		hr = -1;
+		if (copy) {
+			hr = file_operation->CopyItem(from, to, filename, NULL);
+		} else {
+			hr = file_operation->MoveItem(from, to, filename, NULL);
+		}
+
+		if (hr >= 0) {
 			hr = file_operation->PerformOperations();
 		}
 
